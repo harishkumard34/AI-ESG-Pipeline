@@ -45,13 +45,15 @@ def db_history_check_tool(category: str) -> str:
     """
     return f"The historical average for {category} is around 1000 units/kWh per month. Anything above 20000 is highly suspicious."    
 
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
 # 1. Load the Policy Document
 print("Loading ESG Policy into BM25 Retriever...")
 loader = TextLoader("app/data/esg_policy.txt", encoding="utf-8")
 documents = loader.load()
 
 # 2. Split the text into smaller chunks
-text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
 docs = text_splitter.split_documents(documents)
 
 # 3. Create BM25 Retriever (No API Keys, No Network Requests, 100% Local!)

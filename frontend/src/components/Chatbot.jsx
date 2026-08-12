@@ -28,11 +28,10 @@ export default function Chatbot() {
 
     try {
       const response = await axios.post('http://127.0.0.1:8000/api/chat/', {
-        query: userMessage.content,
-        thread_id: "demo-thread"
+        message: userMessage.content
       });
       
-      setMessages(prev => [...prev, { role: 'ai', content: response.data.response }]);
+      setMessages(prev => [...prev, { role: 'ai', content: response.data.reply }]);
     } catch (error) {
       setMessages(prev => [...prev, { role: 'ai', content: "Sorry, I couldn't process that request." }]);
     } finally {

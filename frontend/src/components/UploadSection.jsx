@@ -2,6 +2,8 @@ import { useState, useRef } from 'react';
 import axios from 'axios';
 import { UploadCloud, File, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+
 export default function UploadSection({ onUploadSuccess }) {
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState(null);

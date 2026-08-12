@@ -11,10 +11,15 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="AI ESG Pipeline API")
 
+import os
+
 # CORS Setup - Frontend connect panna thevai
+# Secure panni vachurukkom (Only Vercel and Localhost allowed)
+FRONTEND_URL = os.getenv("FRONTEND_URL", "https://ai-esg-pipeline.vercel.app")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[FRONTEND_URL, "http://localhost:5173", "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -7,6 +7,7 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 export default function RecordsPage() {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('all'); // 'all' or 'anomalies'
 
   useEffect(() => {
     fetchRecords();
@@ -41,6 +42,8 @@ export default function RecordsPage() {
   const validCount = records.filter(r => !r.is_suspicious).length;
   const invalidCount = records.filter(r => r.is_suspicious).length;
 
+  const filteredRecords = filter === 'anomalies' ? records.filter(r => r.is_suspicious) : records;
+
   return (
     <div className="animate-slide-up">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px' }}>
@@ -50,14 +53,18 @@ export default function RecordsPage() {
         </div>
         
         <div style={{ display: 'flex', gap: '24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255,255,255,0.4)', padding: '12px 24px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.6)' }}>
+          <div 
+            onClick={() => setFilter('all')}
+            style={{ display: 'flex', alignItems: 'center', gap: '12px', background: filter === 'all' ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.4)', padding: '12px 24px', borderRadius: '16px', border: filter === 'all' ? '2px solid var(--primary)' : '2px solid transparent', cursor: 'pointer', transition: 'all 0.2s ease', boxShadow: filter === 'all' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none' }}>
              <ShieldCheck size={24} color="var(--primary)" />
              <div>
                <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600 }}>Total Records</p>
                <h4 style={{ fontSize: '20px', fontWeight: 700 }}>{records.length}</h4>
              </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255,255,255,0.4)', padding: '12px 24px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.6)' }}>
+          <div 
+            onClick={() => setFilter('anomalies')}
+            style={{ display: 'flex', alignItems: 'center', gap: '12px', background: filter === 'anomalies' ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.4)', padding: '12px 24px', borderRadius: '16px', border: filter === 'anomalies' ? '2px solid var(--danger)' : '2px solid transparent', cursor: 'pointer', transition: 'all 0.2s ease', boxShadow: filter === 'anomalies' ? '0 4px 12px rgba(239, 68, 68, 0.1)' : 'none' }}>
              <AlertTriangle size={24} color="var(--danger)" />
              <div>
                <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600 }}>Anomalies</p>
@@ -69,14 +76,18 @@ export default function RecordsPage() {
 
       <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
         <div style={{ padding: '24px 32px', borderBottom: '1px solid rgba(0,0,0,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.4)' }}>
-          <h2 style={{ fontSize: '20px', fontWeight: 600 }}>Normalized Data</h2>
+          <h2 style={{ fontSize: '20px', fontWeight: 600 }}>
+            {filter === 'anomalies' ? 'Anomalous Records' : 'All Normalized Data'}
+          </h2>
           <button onClick={fetchRecords} className="btn-outline" style={{ padding: '8px 16px', fontSize: '14px' }}>Refresh Data</button>
         </div>
         
         {loading ? (
           <div style={{ padding: '64px', textAlign: 'center', color: 'var(--primary)', fontWeight: 500 }}>Fetching latest records...</div>
-        ) : records.length === 0 ? (
-          <div style={{ padding: '64px', textAlign: 'center', color: 'var(--text-muted)' }}>No records found. Upload a file to see data here.</div>
+        ) : filteredRecords.length === 0 ? (
+          <div style={{ padding: '64px', textAlign: 'center', color: 'var(--text-muted)' }}>
+            {filter === 'anomalies' ? 'No anomalies detected! 🎉' : 'No records found. Upload a file to see data here.'}
+          </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
@@ -91,7 +102,7 @@ export default function RecordsPage() {
                 </tr>
               </thead>
               <tbody>
-                {records.map((record, i) => (
+                {filteredRecords.map((record, i) => (
                   <tr key={record.id} style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.3)', transition: 'background 0.2s ease' }}>
                     <td style={{ padding: '20px 24px', fontWeight: 500 }}>{record.category}</td>
                     <td style={{ padding: '20px 24px', fontWeight: 600 }}>{record.amount.toLocaleString()}</td>

@@ -14,7 +14,11 @@ async def chat_with_agent(request: ChatRequest):
     print(f"User asked: {request.message}")
     
     # Chatbot-ku instructions tharom
-    sys_msg = SystemMessage(content="You are a helpful ESG Policy Assistant for DemoCorp. Always use the `rag_policy_search_tool` to find the correct policy before answering. If the answer is not in the policy, say 'I don't know based on the company policy.' Do not make up answers.")
+    sys_msg = SystemMessage(content="""You are a helpful ESG Policy Assistant. 
+You must ALWAYS use the `rag_policy_search_tool` to answer the user's question. 
+If the user says 'hi' or greets you, introduce yourself as the ESG AI Assistant and tell them they can ask about the company's environmental, social, or governance policies.
+If the tool returns information, use it to answer the question.
+If the answer is truly not in the tool's response, say 'I don't know based on the company policy.'""")
     user_msg = HumanMessage(content=request.message)
     
     # Chatbot-a run panrom

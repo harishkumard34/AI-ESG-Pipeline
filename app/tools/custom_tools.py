@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from langchain_community.document_loaders import TextLoader
 # pyrefly: ignore [missing-import]
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import CharacterTextSplitter
 # pyrefly: ignore [missing-import]
@@ -65,7 +65,14 @@ text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=50)
 docs = text_splitter.split_documents(documents)
 
 # 3. Create Embeddings and Vector Store (FAISS)
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+hf_token = os.getenv("HF_TOKEN")
+if not hf_token:
+    print("WARNING: HF_TOKEN is missing! Embeddings might fail.")
+
+embeddings = HuggingFaceInferenceAPIEmbeddings(
+    api_key=hf_token,
+    model_name="sentence-transformers/all-MiniLM-L6-v2"
+)
 vectorstore = FAISS.from_documents(docs, embeddings)
 print("RAG Vector Database Ready!")
 

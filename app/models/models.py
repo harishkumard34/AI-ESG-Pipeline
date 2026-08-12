@@ -35,6 +35,7 @@ class NormalizedRecord(Base):
     date = Column(String)
     is_suspicious = Column(Boolean, default=False)
     ai_reasoning = Column(String, nullable=True)
+    auditor_status = Column(String, default="Pending") # 'Pending', 'Approved', 'Rejected'
 
 class AuditLog(Base):
     __tablename__ = "audit_logs"

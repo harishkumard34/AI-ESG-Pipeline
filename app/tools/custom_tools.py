@@ -64,7 +64,7 @@ documents = loader.load()
 text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=50)
 docs = text_splitter.split_documents(documents)
 
-# 3. Create Embeddings and Vector Store (FAISS)
+# 3. Create Embeddings and Vector Store (FAISS) - Lazy Load
 hf_token = os.getenv("HF_TOKEN")
 if not hf_token:
     print("WARNING: HF_TOKEN is missing! Embeddings might fail.")
@@ -73,8 +73,16 @@ embeddings = HuggingFaceInferenceAPIEmbeddings(
     api_key=hf_token,
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
-vectorstore = FAISS.from_documents(docs, embeddings)
-print("RAG Vector Database Ready!")
+
+vectorstore = None
+
+def get_vectorstore():
+    global vectorstore
+    if vectorstore is None:
+        print("Loading ESG Policy into Vector Database (Lazy Load)...")
+        vectorstore = FAISS.from_documents(docs, embeddings)
+        print("RAG Vector Database Ready!")
+    return vectorstore
 
 @tool
 def rag_policy_search_tool(query: str) -> str:
@@ -83,6 +91,7 @@ def rag_policy_search_tool(query: str) -> str:
     Input should be a clear search query.
     Returns the most relevant text from the policy document.
     """
-    results = vectorstore.similarity_search(query, k=2) # Top 2 matches
+    vs = get_vectorstore()
+    results = vs.similarity_search(query, k=2) # Top 2 matches
     answer = "\n\n".join([doc.page_content for doc in results])
     return answer   

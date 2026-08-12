@@ -1,4 +1,12 @@
 import os
+import socket
+import urllib3.util.connection as urllib3_cn
+
+# Force IPv4 to fix Render's DNS resolution bug for api-inference.huggingface.co
+def allowed_gai_family():
+    return socket.AF_INET
+urllib3_cn.allowed_gai_family = allowed_gai_family
+
 import pandas as pd
 from langchain_community.document_loaders import TextLoader
 # pyrefly: ignore [missing-import]

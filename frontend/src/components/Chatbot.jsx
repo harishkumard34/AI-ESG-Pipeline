@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { Bot, Send, X, MessageSquare, Sparkles } from 'lucide-react';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -27,7 +29,7 @@ export default function Chatbot() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/chat/', {
+      const response = await axios.post(`${API_BASE}/api/chat/`, {
         message: userMessage.content
       });
       

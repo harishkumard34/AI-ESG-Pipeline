@@ -4,6 +4,8 @@ import Chatbot from '../components/Chatbot';
 import UploadSection from '../components/UploadSection';
 import { Activity, AlertTriangle, CheckCircle2, ShieldCheck, Check, X } from 'lucide-react';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+
 export default function Dashboard() {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,7 +17,7 @@ export default function Dashboard() {
   const fetchRecords = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://127.0.0.1:8000/api/records/');
+      const response = await axios.get(`${API_BASE}/api/records/`);
       setRecords(response.data.data);
     } catch (error) {
       console.error('Error fetching records:', error);
@@ -26,7 +28,7 @@ export default function Dashboard() {
 
   const handleAuditorAction = async (recordId, newStatus) => {
     try {
-      await axios.put(`http://127.0.0.1:8000/api/records/${recordId}`, {
+      await axios.put(`${API_BASE}/api/records/${recordId}`, {
         status: newStatus
       });
       // Update local state without fetching all again

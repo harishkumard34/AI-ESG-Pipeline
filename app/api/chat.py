@@ -23,9 +23,15 @@ If you don't know the answer or it's not in the policy, politely say you couldn'
     user_msg = HumanMessage(content=request.message)
     
     # Chatbot-a run panrom
-    response = chatbot_agent.invoke({"messages": [sys_msg, user_msg]})
-    
-    # AI sonna kadasivida badhil
-    ai_reply = response["messages"][-1].content
+    try:
+        response = chatbot_agent.invoke({"messages": [sys_msg, user_msg]})
+        # AI sonna kadasivida badhil
+        ai_reply = response["messages"][-1].content
+    except Exception as e:
+        error_msg = str(e)
+        if "rate_limit_exceeded" in error_msg or "429" in error_msg:
+            ai_reply = "Sorry boss! Namma Groq AI-oda daily free token limit (1,00,000) over aagiduchu. Neenga neraya kelvi kettathala indha limit cross aagiduchu. Oru 1 hour kalichu try pannunga!"
+        else:
+            ai_reply = f"Error ayiduchu thalaiva: {error_msg}"
     
     return {"reply": ai_reply}

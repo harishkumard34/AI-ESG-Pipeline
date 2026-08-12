@@ -1,18 +1,8 @@
 import os
-import socket
-import urllib3.util.connection as urllib3_cn
-
-# Force IPv4 to fix Render's DNS resolution bug for api-inference.huggingface.co
-def allowed_gai_family():
-    return socket.AF_INET
-urllib3_cn.allowed_gai_family = allowed_gai_family
-
 import pandas as pd
 from langchain_community.document_loaders import TextLoader
-# pyrefly: ignore [missing-import]
-from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
-from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import CharacterTextSplitter
+from langchain_community.retrievers import BM25Retriever
 # pyrefly: ignore [missing-import]
 from PyPDF2 import PdfReader
 from langchain_core.tools import tool
@@ -31,12 +21,10 @@ def read_raw_file_tool(file_path: str) -> str:
     
     try:
         if file_ext in [".xlsx", ".xls"]:
-            # Excel file-a irundha Pandas vechu padikkurom
             df = pd.read_excel(file_path)
-            return df.to_json(orient="records") # AI-ku puriyara JSON string-a anuppurom
+            return df.to_json(orient="records")
             
         elif file_ext == ".pdf":
-            # PDF-a irundha text mattum edukkrom
             reader = PdfReader(file_path)
             text = ""
             for page in reader.pages:
@@ -49,22 +37,16 @@ def read_raw_file_tool(file_path: str) -> str:
     except Exception as e:
         return f"Error reading file: {str(e)}"
 
-
 @tool
 def db_history_check_tool(category: str) -> str:
     """
     Checks the historical database for past consumption patterns for a given category.
     Returns the average historical consumption.
     """
-    # Ippothaiku AI-ku puriyara mathiri oru dummy history tharom.
-    # (Future-la idhu direct-a DB-la query panni edukka vekkalam)
     return f"The historical average for {category} is around 1000 units/kWh per month. Anything above 20000 is highly suspicious."    
 
-
- 
-
 # 1. Load the Policy Document
-print("Loading ESG Policy into Vector Database...")
+print("Loading ESG Policy into BM25 Retriever...")
 loader = TextLoader("app/data/esg_policy.txt", encoding="utf-8")
 documents = loader.load()
 
@@ -72,25 +54,17 @@ documents = loader.load()
 text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=50)
 docs = text_splitter.split_documents(documents)
 
-# 3. Create Embeddings and Vector Store (FAISS) - Lazy Load
-hf_token = os.getenv("HF_TOKEN")
-if not hf_token:
-    print("WARNING: HF_TOKEN is missing! Embeddings might fail.")
+# 3. Create BM25 Retriever (No API Keys, No Network Requests, 100% Local!)
+retriever = None
 
-embeddings = HuggingFaceInferenceAPIEmbeddings(
-    api_key=hf_token,
-    model_name="sentence-transformers/all-MiniLM-L6-v2"
-)
-
-vectorstore = None
-
-def get_vectorstore():
-    global vectorstore
-    if vectorstore is None:
-        print("Loading ESG Policy into Vector Database (Lazy Load)...")
-        vectorstore = FAISS.from_documents(docs, embeddings)
-        print("RAG Vector Database Ready!")
-    return vectorstore
+def get_retriever():
+    global retriever
+    if retriever is None:
+        print("Initializing Local BM25 Retriever...")
+        retriever = BM25Retriever.from_documents(docs)
+        retriever.k = 2  # Top 2 matches
+        print("BM25 Retriever Ready!")
+    return retriever
 
 @tool
 def rag_policy_search_tool(query: str) -> str:
@@ -99,7 +73,7 @@ def rag_policy_search_tool(query: str) -> str:
     Input should be a clear search query.
     Returns the most relevant text from the policy document.
     """
-    vs = get_vectorstore()
-    results = vs.similarity_search(query, k=2) # Top 2 matches
+    ret = get_retriever()
+    results = ret.invoke(query)
     answer = "\n\n".join([doc.page_content for doc in results])
     return answer   

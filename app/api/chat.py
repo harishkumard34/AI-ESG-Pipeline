@@ -1,7 +1,8 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 from langchain_core.messages import SystemMessage, HumanMessage
-from app.agents.chatbot import chatbot_agent
+from app.agents.llm_setup import llm
+from app.tools.custom_tools import rag_policy_search_tool
 
 router = APIRouter()
 
@@ -13,20 +14,27 @@ class ChatRequest(BaseModel):
 async def chat_with_agent(request: ChatRequest):
     print(f"User asked: {request.message}")
     
-    # Chatbot-ku instructions tharom
-    sys_msg = SystemMessage(content="""You are a helpful ESG Policy Assistant. 
+    try:
+        # 1. Direct-a Python laye thedi eduthudalam! (Avoids tool hallucination / 400 Error)
+        policy_context = rag_policy_search_tool.invoke({"query": request.message})
+        
+        # 2. Chatbot-ku instructions tharom
+        sys_msg = SystemMessage(content=f"""You are a helpful ESG Policy Assistant. 
+Here is the retrieved policy document for context:
+{policy_context}
+
 CRITICAL RULE FOR LANGUAGE: Match the user's language!
 - If the user asks in English, you MUST reply entirely in professional English.
 - If the user asks in "Tanglish" (a conversational mix of Tamil and English written in the English alphabet), you MUST reply in Tanglish (e.g., "Ama boss, idhu thaan policy"). Be very friendly and polite.
 If the user says 'hi', introduce yourself as the ESG AI Assistant in the matching language.
-If you don't know the answer or it's not in the policy, politely say you couldn't find it in the policy (in the matching language).""")
-    user_msg = HumanMessage(content=request.message)
-    
-    # Chatbot-a run panrom
-    try:
-        response = chatbot_agent.invoke({"messages": [sys_msg, user_msg]})
-        # AI sonna kadasivida badhil
-        ai_reply = response["messages"][-1].content
+If you don't know the answer or it's not in the policy context provided, politely say you couldn't find it in the policy (in the matching language).""")
+        
+        user_msg = HumanMessage(content=request.message)
+        
+        # 3. Direct-a LLM-a run panrom (Agent thevai illa)
+        response = llm.invoke([sys_msg, user_msg])
+        ai_reply = response.content
+
     except Exception as e:
         error_msg = str(e)
         if "rate_limit_exceeded" in error_msg or "429" in error_msg:

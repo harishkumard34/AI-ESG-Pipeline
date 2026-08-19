@@ -33,7 +33,8 @@ If you don't know the answer or it's not in the policy context provided, politel
         
         # 3. Direct-a LLM-a run panrom (Agent thevai illa)
         response = llm.invoke([sys_msg, user_msg])
-        ai_reply = response.content
+        import re
+        ai_reply = re.sub(r'<think>.*?</think>', '', response.content, flags=re.DOTALL).strip()
 
     except Exception as e:
         error_msg = str(e)

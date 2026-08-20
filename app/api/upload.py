@@ -52,6 +52,9 @@ async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db
     ai_output = final_state["extracted_data"]
 
     import re
+    # Strip reasoning tags to prevent JSON extraction from matching brackets inside the <think> block
+    ai_output = re.sub(r'<think>.*?</think>', '', ai_output, flags=re.DOTALL).strip()
+    
     # 5. Clean JSON string (LLMs can be chatty, grab the LAST json block)
     json_blocks = re.findall(r'```json\s*(.*?)\s*```', ai_output, re.DOTALL)
     if json_blocks:

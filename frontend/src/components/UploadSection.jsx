@@ -60,25 +60,27 @@ export default function UploadSection({ onUploadSuccess }) {
           'Content-Type': 'multipart/form-data',
         },
       });
-      
-      setStatus('success');
-      setMessage(res.data.message || 'File processed successfully!');
-      
-      // Notify parent to refresh data
-      if (onUploadSuccess) {
-        onUploadSuccess();
+      if (res.data.status === 'error') {
+        setStatus('error');
+        setMessage(res.data.message || 'Failed to process file.');
+      } else {
+        setStatus('success');
+        setMessage(res.data.message || 'File processed successfully!');
+        
+        if (onUploadSuccess) {
+          onUploadSuccess();
+        }
+        
+        setTimeout(() => {
+          setFile(null);
+          setStatus('idle');
+        }, 3000);
       }
-      
-      // Reset after 3 seconds
-      setTimeout(() => {
-        setFile(null);
-        setStatus('idle');
-      }, 3000);
       
     } catch (err) {
       console.error(err);
       setStatus('error');
-      setMessage(err.response?.data?.message || 'Failed to process file.');
+      setMessage(err.response?.data?.message || err.message || 'Failed to process file.');
     }
   };
 

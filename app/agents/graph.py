@@ -13,7 +13,7 @@ from app.tools.custom_tools import read_raw_file_tool
 from app.agents.llm_setup import llm
 
 def run_extractor(state: AgentState):
-    print(f"--- 🕵️‍♂️ Extractor Agent Reading File: {state['file_path']} ---")
+    print(f"--- Extractor Agent Reading File: {state['file_path']} ---")
     
     # 1. Direct-a Python laye file-a padichudalam! (Saves tokens & avoids tool hallucination)
     file_content = read_raw_file_tool.invoke({"file_path": state['file_path']})
@@ -25,12 +25,12 @@ def run_extractor(state: AgentState):
     return {"extracted_data": response.content}
 
 def run_validator(state: AgentState):
-    print("--- 👮‍♂️ Validator Agent Checking Data ---")
+    print("--- Validator Agent Checking Data ---")
     response = validator_agent.invoke({"extracted_data": state['extracted_data']})
     return {"extracted_data": response.content}
 
 def run_detector(state: AgentState):
-    print("--- 🕵️‍♀️ Anomaly Detector Agent Checking History ---")
+    print("--- Anomaly Detector Agent Checking History ---")
     
     # 3. Direct-a Python laye history context-a kuduthudalam! (Avoids tool hallucination 'update_data')
     history_context = "Historical Average for Utility is 30,000 kWh per month. Historical Average for Travel is 50,000 miles per month."

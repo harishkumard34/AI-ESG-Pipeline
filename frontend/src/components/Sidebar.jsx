@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, UploadCloud, Database, Activity, LogOut } from 'lucide-react';
+import { LayoutDashboard, UploadCloud, Database, Activity, LogOut, Settings } from 'lucide-react';
 
 export default function Sidebar() {
   return (
@@ -11,27 +11,34 @@ export default function Sidebar() {
       top: 0,
       display: 'flex',
       flexDirection: 'column',
-      borderRight: '1px solid rgba(255,255,255,0.3)',
-      background: 'rgba(255,255,255,0.6)',
-      backdropFilter: 'blur(20px)',
-      padding: '32px 0',
+      borderRight: '1px solid var(--border-color)',
+      background: 'var(--bg-panel)',
+      padding: '24px 0',
       zIndex: 100
     }}>
-      <div style={{ padding: '0 32px', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '48px' }}>
-        <div style={{ background: 'linear-gradient(135deg, var(--primary), var(--accent))', padding: '8px', borderRadius: '12px' }}>
-          <Activity color="white" size={24} />
+      <div style={{ padding: '0 24px', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '40px' }}>
+        <div style={{ background: 'var(--primary)', padding: '6px', borderRadius: '8px' }}>
+          <Activity color="white" size={22} />
         </div>
-        <span style={{ fontSize: '20px', fontWeight: 700, letterSpacing: '-0.5px' }}>ESG<span style={{ fontWeight: 400 }}> AI</span></span>
+        <span style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '-0.5px', color: 'var(--text-main)' }}>
+          ESG<span style={{ fontWeight: 400, color: 'var(--text-muted)' }}> AI Pipeline</span>
+        </span>
       </div>
 
-      <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '0 16px', flex: 1 }}>
-        <SidebarLink to="/dashboard" icon={<LayoutDashboard size={20} />} label="Overview" exact />
-        <SidebarLink to="/dashboard/upload" icon={<UploadCloud size={20} />} label="Process Data" />
-        <SidebarLink to="/dashboard/records" icon={<Database size={20} />} label="Records DB" />
+      <div style={{ padding: '0 24px', marginBottom: '12px' }}>
+        <p style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-light)', fontWeight: 600 }}>Main Menu</p>
+      </div>
+
+      <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '0 16px', flex: 1 }}>
+        <SidebarLink to="/dashboard" icon={<LayoutDashboard size={18} />} label="Overview" exact />
+        <SidebarLink to="/dashboard/upload" icon={<UploadCloud size={18} />} label="Process Data" />
+        <SidebarLink to="/dashboard/records" icon={<Database size={18} />} label="Records DB" />
       </nav>
 
       <div style={{ padding: '0 16px' }}>
-        <SidebarLink to="/login" icon={<LogOut size={20} />} label="Logout" />
+        <div style={{ height: '1px', background: 'var(--border-color)', margin: '16px 0' }}></div>
+        <SidebarLink to="/dashboard/settings" icon={<Settings size={18} />} label="Settings" />
+        <SidebarLink to="/login" icon={<LogOut size={18} />} label="Logout" />
       </div>
     </aside>
   );
@@ -46,18 +53,24 @@ function SidebarLink({ to, icon, label, exact }) {
         display: 'flex',
         alignItems: 'center',
         gap: '12px',
-        padding: '14px 20px',
-        borderRadius: '12px',
+        padding: '10px 16px',
+        borderRadius: 'var(--radius-sm)',
         textDecoration: 'none',
         color: isActive ? 'var(--primary)' : 'var(--text-muted)',
-        background: isActive ? 'rgba(79, 70, 229, 0.1)' : 'transparent',
+        background: isActive ? 'var(--primary-light)' : 'transparent',
         fontWeight: isActive ? 600 : 500,
-        transition: 'all 0.2s ease',
-        boxShadow: isActive ? 'inset 2px 0 0 var(--primary)' : 'none'
+        fontSize: '14px',
+        transition: 'all 0.15s ease'
       })}
     >
-      {icon}
-      {label}
+      {({ isActive }) => (
+        <>
+          <div style={{ color: isActive ? 'var(--primary)' : 'var(--text-light)' }}>
+            {icon}
+          </div>
+          {label}
+        </>
+      )}
     </NavLink>
   );
 }

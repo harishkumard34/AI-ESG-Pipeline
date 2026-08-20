@@ -83,12 +83,12 @@ export default function UploadSection({ onUploadSuccess }) {
   };
 
   return (
-    <div className="glass-card animate-slide-up" style={{ padding: '32px', marginBottom: '32px' }}>
+    <div className="saas-card animate-slide-up" style={{ padding: '32px', marginBottom: '32px' }}>
       <div style={{ marginBottom: '24px' }}>
-        <h2 style={{ fontSize: '24px', fontWeight: 600, color: 'var(--text-main)', marginBottom: '8px' }}>
-          Analyze ESG Document
+        <h2 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--text-main)', marginBottom: '8px' }}>
+          Upload & Analyze Data
         </h2>
-        <p style={{ color: 'var(--text-muted)' }}>Upload your utility bills or ESG reports (PDF/Excel) for AI analysis.</p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Upload your utility bills, invoices, or ESG reports for LangGraph AI processing.</p>
       </div>
 
       <div 
@@ -97,12 +97,12 @@ export default function UploadSection({ onUploadSuccess }) {
         onDragOver={handleDrag}
         onDrop={handleDrop}
         style={{
-          border: `2px dashed ${dragActive ? 'var(--primary)' : 'rgba(79, 70, 229, 0.2)'}`,
+          border: `2px dashed ${dragActive ? 'var(--primary)' : 'var(--border-color)'}`,
           borderRadius: 'var(--radius-md)',
-          padding: '40px 20px',
+          padding: '48px 20px',
           textAlign: 'center',
-          backgroundColor: dragActive ? 'rgba(79, 70, 229, 0.05)' : 'rgba(255, 255, 255, 0.5)',
-          transition: 'all 0.3s ease',
+          backgroundColor: dragActive ? 'var(--primary-light)' : '#f8fafc',
+          transition: 'all 0.2s ease',
           cursor: 'pointer'
         }}
         onClick={status === 'idle' ? onButtonClick : undefined}
@@ -117,41 +117,45 @@ export default function UploadSection({ onUploadSuccess }) {
 
         {status === 'uploading' ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-            <Loader2 size={48} color="var(--primary)" style={{ animation: 'spin 1s linear infinite' }} />
-            <div style={{ fontWeight: 500, color: 'var(--primary)' }}>AI is analyzing your document...</div>
+            <Loader2 size={40} color="var(--primary)" style={{ animation: 'spin 1s linear infinite' }} />
+            <div style={{ fontWeight: 500, color: 'var(--primary)', fontSize: '15px' }}>Processing with LangGraph Pipeline...</div>
             <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
           </div>
         ) : status === 'success' ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-            <CheckCircle size={48} color="var(--success)" />
-            <div style={{ fontWeight: 500, color: 'var(--success)' }}>{message}</div>
+            <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: 'var(--success-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <CheckCircle size={32} color="var(--success)" />
+            </div>
+            <div style={{ fontWeight: 600, color: 'var(--success)', fontSize: '16px' }}>{message}</div>
           </div>
         ) : status === 'error' ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-            <AlertCircle size={48} color="var(--danger)" />
-            <div style={{ fontWeight: 500, color: 'var(--danger)' }}>{message}</div>
-            <button onClick={() => setStatus('idle')} className="btn-outline" style={{ marginTop: '8px' }}>Try Again</button>
+            <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: 'var(--danger-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <AlertCircle size={32} color="var(--danger)" />
+            </div>
+            <div style={{ fontWeight: 500, color: 'var(--danger)', fontSize: '15px' }}>{message}</div>
+            <button onClick={(e) => { e.stopPropagation(); setStatus('idle'); }} className="btn-outline" style={{ marginTop: '8px' }}>Try Again</button>
           </div>
         ) : file ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-            <File size={48} color="var(--primary)" />
-            <div style={{ fontWeight: 500 }}>{file.name}</div>
-            <div style={{ color: 'var(--text-muted)', fontSize: '14px' }}>{(file.size / 1024 / 1024).toFixed(2)} MB</div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+            <File size={40} color="var(--primary)" />
+            <div style={{ fontWeight: 600, fontSize: '15px' }}>{file.name}</div>
+            <div style={{ color: 'var(--text-light)', fontSize: '13px' }}>{(file.size / 1024 / 1024).toFixed(2)} MB</div>
             
-            <div style={{ display: 'flex', gap: '16px', marginTop: '16px' }}>
+            <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
               <button onClick={(e) => { e.stopPropagation(); setFile(null); }} className="btn-outline">Cancel</button>
-              <button onClick={(e) => { e.stopPropagation(); handleUpload(); }} className="btn-primary">Process with AI</button>
+              <button onClick={(e) => { e.stopPropagation(); handleUpload(); }} className="btn-primary">Analyze with AI</button>
             </div>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-            <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: 'rgba(79, 70, 229, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <UploadCloud size={32} color="var(--primary)" />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: 'white', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-sm)', marginBottom: '8px' }}>
+              <UploadCloud size={28} color="var(--primary)" />
             </div>
             <div>
-              <span style={{ fontWeight: 600, color: 'var(--primary)' }}>Click to upload</span> or drag and drop
+              <span style={{ fontWeight: 600, color: 'var(--primary)' }}>Click to upload</span> <span style={{ color: 'var(--text-muted)' }}>or drag and drop</span>
             </div>
-            <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>PDF, Excel (Max 10MB)</p>
+            <p style={{ color: 'var(--text-light)', fontSize: '13px' }}>PDF, Excel (Max 10MB)</p>
           </div>
         )}
       </div>

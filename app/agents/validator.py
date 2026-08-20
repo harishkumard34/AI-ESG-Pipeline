@@ -6,7 +6,7 @@ You will receive a JSON string of ESG data.
 Your job is to check if any row has missing dates, negative amounts, or 0 amounts.
 Return the same JSON string, but add a 'status' field to each row: 'Valid' or 'Invalid'.
 If 'Invalid', also add an 'error_reason' field.
-Return ONLY the JSON array, no other text."""
+CRITICAL: Keep your <think> process extremely short, under 50 words. Return ONLY the JSON array, no other text."""
 
 prompt = ChatPromptTemplate.from_messages([
     ("system", system_msg),

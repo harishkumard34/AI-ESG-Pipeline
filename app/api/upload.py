@@ -98,5 +98,7 @@ async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db
         }
         
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         db.rollback()
         return {"status": "error", "message": "Failed to save to database", "details": str(e), "raw_ai": ai_output, "clean_ai": ai_output_clean}

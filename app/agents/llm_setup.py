@@ -8,5 +8,5 @@ load_dotenv()
 llm = ChatGroq(
     api_key=os.getenv("GROQ_API_KEY"),
     model="qwen/qwen3.6-27b",  # Fallback to Qwen since Llama models were decommissioned
-    max_tokens=1000 # STRICT LIMIT to prevent Rate Limit (429) errors!
+    max_tokens=2000 # Increased to 2000 to prevent reasoning truncation but keep under 8000 TPM limit
 )

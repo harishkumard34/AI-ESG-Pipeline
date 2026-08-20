@@ -18,7 +18,7 @@ def run_extractor(state: AgentState):
     # 1. Direct-a Python laye file-a padichudalam! (Saves tokens & avoids tool hallucination)
     file_content = read_raw_file_tool.invoke({"file_path": state['file_path']})
     
-    sys_msg = SystemMessage(content="You are an expert AI ESG Data Extractor. Extract key ESG data from the provided text. CRITICAL: Return ONLY a valid JSON array of objects like [{'category':'Utility', 'amount':100, 'unit':'kWh', 'date':'April 2024'}]. No markdown, no extra text.")
+    sys_msg = SystemMessage(content='You are an expert AI ESG Data Extractor. Extract key ESG data from the provided text. CRITICAL: Return ONLY a valid JSON array of objects like [{"category":"Utility", "amount":100, "unit":"kWh", "date":"April 2024"}]. No markdown, no extra text. Keep your <think> process extremely short, under 50 words.')
     user_msg = HumanMessage(content=f"Extract data from this text:\n{file_content}")
     
     response = llm.invoke([sys_msg, user_msg])
@@ -35,7 +35,7 @@ def run_detector(state: AgentState):
     # 3. Direct-a Python laye history context-a kuduthudalam! (Avoids tool hallucination 'update_data')
     history_context = "Historical Average for Utility is 30,000 kWh per month. Historical Average for Travel is 50,000 miles per month."
     
-    sys_msg = SystemMessage(content="You are an Anomaly Detector Agent. Compare the JSON data against the historical averages. If any 'amount' is wildly higher (e.g. >50000 for Utility), change its 'status' to 'Invalid' and write the 'error_reason'. CRITICAL: Output ONLY a valid raw JSON array of objects. Do NOT write python scripts. Do NOT explain. Just output the array.")
+    sys_msg = SystemMessage(content='You are an Anomaly Detector Agent. Compare the JSON data against the historical averages. If any "amount" is wildly higher (e.g. >50000 for Utility), change its "status" to "Invalid" and write the "error_reason". CRITICAL: Output ONLY a valid raw JSON array of objects. Do NOT write python scripts. Do NOT explain. Keep your <think> process extremely short, under 50 words. Just output the array.')
     user_msg = HumanMessage(content=f"History: {history_context}\n\nData to check:\n{state['extracted_data']}")
     
     from app.agents.llm_setup import llm
